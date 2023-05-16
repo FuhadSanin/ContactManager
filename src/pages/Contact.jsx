@@ -2,38 +2,41 @@ import React, { useState, useEffect } from "react"
 import { RiContactsLine, RiDeleteBinLine } from "react-icons/ri"
 import { AiOutlineEdit } from "react-icons/ai"
 
+const LOCAL_STORAGE_KEY = "contacts"
+
 export const Contact = () => {
-  const LOCAL_STORAGE_KEY = "contact"
-  const [contact, setContact] = useState([])
+  const [contact, setContact] = useState(null) // Update initial state to null
   const [name, setName] = useState("")
   const [phone, setPhone] = useState("")
   const [searchData, setSearchData] = useState("")
 
   const handleSubmit = e => {
     e.preventDefault()
-    console.log(contact)
   }
 
-  //includes is used to check if a string is included in another string
-  let searchContact = contact.filter(check => {
-    return check.name.includes(searchData)
-  })
+  let searchContact = contact
+    ? contact.filter(check => {
+        return check.name.includes(searchData)
+      })
+    : []
 
-  // useEffect is used to run a function when the component is rendered
-  // LocalStorage is used to store data in the browser
-
-  // parse is used to convert a string to an object
   useEffect(() => {
-    const storageContact = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY))
-    if (storageContact) setContact(storageContact)
+    const storedContacts = localStorage.getItem(LOCAL_STORAGE_KEY)
+    if (storedContacts) {
+      setContact(JSON.parse(storedContacts))
+    } else {
+      setContact([]) // Set an empty array if no data is available
+    }
   }, [])
 
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contact))
+    if (contact !== null) {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(contact))
+    }
   }, [contact])
 
   const addContactHandler = () => {
-    if (name == "" || phone == "" || isNaN(phone)) {
+    if (name === "" || phone === "" || isNaN(phone)) {
       alert("Please fill out all fields")
       return
     } else {
@@ -49,6 +52,7 @@ export const Contact = () => {
     })
     setContact(newContactList)
   }
+
   return (
     <div>
       <div>
